@@ -4,6 +4,6 @@ import (
 	"testing"
 )
 
-func TestFileClass_Test(t *testing.T) {
-
+func TestFileClass_AppendFile(t *testing.T) {
+	File.AppendFile(`1.txt`, "haha\n")
 }

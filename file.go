@@ -26,6 +26,18 @@ func (this *FileClass) WriteFile(filename string, datas []byte) {
 	}
 }
 
+//AppendFile 附加内容到文件(不存在就创建)
+func (this *FileClass) AppendFile(filename string, text string) {
+	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+	if _, err = f.WriteString(text); err != nil {
+		panic(err)
+	}
+}
+
 func (this *FileClass) Exists(fileOrPath string) bool {
 	_, err := os.Stat(fileOrPath)
 	if err != nil {
