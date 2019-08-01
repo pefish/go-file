@@ -1,11 +1,10 @@
-package p_file
+package go_file
 
 import (
 	"bufio"
 	"bytes"
 	"fmt"
 	"github.com/pefish/go-error"
-	"github.com/pefish/go-slice"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -111,7 +110,7 @@ func (this *FileClass) ReadLine(filename string, callback func(string)) {
 
 func (this *FileClass) GetExt(filename string) string {
 	arr := strings.Split(filename, `.`)
-	return p_slice.Slice.GetLastOfSliceString(arr)
+	return arr[len(arr) - 1]
 }
 
 func (this *FileClass) ReadFileWithErr(filename string) ([]byte, error) {
@@ -125,7 +124,7 @@ func (this *FileClass) ReadFileWithErr(filename string) ([]byte, error) {
 func (this *FileClass) MultipartFileToBytes(file multipart.File) []byte {
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
-		p_error.ThrowInternal(`MultipartFileToBytes error`)
+		go_error.ThrowInternal(`MultipartFileToBytes error`)
 	}
 	return buf.Bytes()
 }

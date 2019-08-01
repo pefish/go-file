@@ -1,4 +1,4 @@
-package p_file
+package go_file
 
 import (
 	"testing"
