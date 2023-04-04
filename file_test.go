@@ -5,5 +5,5 @@ import (
 )
 
 func TestFileClass_AppendFile(t *testing.T) {
-	File.AppendFile(`1.txt`, "haha\n")
+	FileUtilInstance.AppendFile(`1.txt`, "haha\n")
 }
