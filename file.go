@@ -94,7 +94,7 @@ func (fc *FileClass) ReadFile(filename string) []byte {
 	return bytes
 }
 
-func (fc *FileClass) ReadLine(filename string, callback func(string)) {
+func (fc *FileClass) ReadLine(filename string, callback func(string, bool)) {
 	f, err := os.Open(filename)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "utils: %v\n", err)
@@ -102,8 +102,9 @@ func (fc *FileClass) ReadLine(filename string, callback func(string)) {
 	}
 	input := bufio.NewScanner(f)
 	for input.Scan() {
-		callback(input.Text())
+		callback(input.Text(), true)
 	}
+	callback("", false)
 }
 
 func (fc *FileClass) GetExt(filename string) string {
