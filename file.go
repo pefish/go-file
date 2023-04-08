@@ -94,17 +94,33 @@ func (fc *FileClass) ReadFile(filename string) []byte {
 	return bytes
 }
 
-func (fc *FileClass) ReadLine(filename string, callback func(string, bool)) {
+func (fc *FileClass) ReadLine(filename string, callback func(string, bool)) error {
 	f, err := os.Open(filename)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "utils: %v\n", err)
-		return
+		return err
 	}
+	defer f.Close()
+
 	input := bufio.NewScanner(f)
 	for input.Scan() {
 		callback(input.Text(), true)
 	}
 	callback("", false)
+	return nil
+}
+
+func (fc *FileClass) WriteLines(filename string, lines []string) error {
+	f, err := os.Create(filename)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	w := bufio.NewWriter(f)
+	for _, line := range lines {
+		fmt.Fprintln(w, line)
+	}
+	return w.Flush()
 }
 
 func (fc *FileClass) GetExt(filename string) string {
