@@ -2,6 +2,8 @@ github.com/pefish/go-error v0.2.0 h1:WNJX9EpOlfhqc8OX/FuLDcgZ+ccDRXdQbikOiMmF9Q8
 github.com/pefish/go-error v0.2.0/go.mod h1:J+uA2hCnHSIbZgezmjvmWBizZTnmFhL5hOIXUqfx+BA=
 github.com/pefish/go-error v1.0.4 h1:qbUWT6vhpZIEnIdJDiRaoaZcnJ6pZPq1Edi4+t47w3o=
 github.com/pefish/go-error v1.0.4/go.mod h1:OLnjLGHgKqEZSsSwKdx6QDBH9o9mqVCMTBroRuUZQDc=
+github.com/pefish/go-error v1.0.7 h1:bSvBtQ6PGYxtLLIPDbxh7X7XSTCELc0C0KwiEYjRwy4=
+github.com/pefish/go-error v1.0.7/go.mod h1:DrrC/osWSJTTaH/txuos6t1YIitr1Y2GGhnxzfZ7VAI=
 github.com/pefish/go-test-assert v0.0.1/go.mod h1:kfcsv5ag411u06gdV4iRKU8D0zOglian/DBacnCoQdc=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=

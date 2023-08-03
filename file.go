@@ -94,7 +94,7 @@ func (fc *FileClass) ReadFile(filename string) []byte {
 	return bytes
 }
 
-func (fc *FileClass) ReadLine(filename string, callback func(string, bool)) error {
+func (fc *FileClass) ReadLine(filename string, callback func(text string, shouldProcess bool) error) error {
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -103,9 +103,15 @@ func (fc *FileClass) ReadLine(filename string, callback func(string, bool)) erro
 
 	input := bufio.NewScanner(f)
 	for input.Scan() {
-		callback(input.Text(), true)
+		err := callback(input.Text(), true)
+		if err != nil {
+			return err
+		}
 	}
-	callback("", false)
+	err = callback("", false)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
