@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/pefish/go-error"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"os"
 	"path/filepath"
@@ -19,7 +18,7 @@ type FileClass struct {
 var FileUtilInstance = FileClass{}
 
 func (fc *FileClass) WriteFile(filename string, datas []byte) {
-	err := ioutil.WriteFile(filename, datas, 0777)
+	err := os.WriteFile(filename, datas, 0777)
 	if err != nil {
 		panic(err)
 	}
@@ -87,14 +86,14 @@ func (fc *FileClass) AssertPathExist(path string) {
 }
 
 func (fc *FileClass) ReadFile(filename string) []byte {
-	bytes, err := ioutil.ReadFile(filename)
+	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 	return bytes
 }
 
-func (fc *FileClass) ReadLine(filename string, callback func(text string, shouldProcess bool) (stop bool, err error)) error {
+func (fc *FileClass) ReadLine(filename string, callback func(text string, shouldProcess bool) error) error {
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -103,15 +102,12 @@ func (fc *FileClass) ReadLine(filename string, callback func(text string, should
 
 	input := bufio.NewScanner(f)
 	for input.Scan() {
-		stop, err := callback(input.Text(), true)
+		err = callback(input.Text(), true)
 		if err != nil {
 			return err
 		}
-		if stop {
-			return nil
-		}
 	}
-	_, err = callback("", false)
+	err = callback("", false)
 	if err != nil {
 		return err
 	}
@@ -138,7 +134,7 @@ func (fc *FileClass) GetExt(filename string) string {
 }
 
 func (fc *FileClass) ReadFileWithErr(filename string) ([]byte, error) {
-	bytes, err := ioutil.ReadFile(filename)
+	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
