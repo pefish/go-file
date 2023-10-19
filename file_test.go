@@ -9,7 +9,7 @@ func TestFileClass_AppendFile(t *testing.T) {
 }
 
 func TestFile_MustWriteCsvFile(t *testing.T) {
-	FileInstance.WriteCsvFile("1.csv", [][]string{
+	FileInstance.AppendCsvFile("1.csv", [][]string{
 		[]string{
 			"123",
 			"gsfdga",

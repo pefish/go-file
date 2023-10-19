@@ -33,14 +33,14 @@ func (fc *File) WriteFile(filename string, datas []byte) error {
 	return nil
 }
 
-func (fc *File) MustWriteCsvFile(filename string, records [][]string) {
-	err := fc.WriteCsvFile(filename, records)
+func (fc *File) MustAppendCsvFile(filename string, records [][]string) {
+	err := fc.AppendCsvFile(filename, records)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (fc *File) WriteCsvFile(filename string, records [][]string) error {
+func (fc *File) AppendCsvFile(filename string, records [][]string) error {
 	f, err := os.OpenFile(filename, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
 		return err
