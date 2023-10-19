@@ -3,6 +3,7 @@ package go_file
 import (
 	"bufio"
 	"bytes"
+	"encoding/csv"
 	"fmt"
 	"github.com/pefish/go-error"
 	"io"
@@ -12,31 +13,72 @@ import (
 	"strings"
 )
 
-type FileClass struct {
+type File struct {
 }
 
-var FileUtilInstance = FileClass{}
+var FileInstance = File{}
 
-func (fc *FileClass) WriteFile(filename string, datas []byte) {
+func (fc *File) MustWriteFile(filename string, datas []byte) {
+	err := fc.WriteFile(filename, datas)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (fc *File) WriteFile(filename string, datas []byte) error {
 	err := os.WriteFile(filename, datas, 0777)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (fc *File) MustWriteCsvFile(filename string, records [][]string) {
+	err := fc.WriteCsvFile(filename, records)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (fc *File) WriteCsvFile(filename string, records [][]string) error {
+	f, err := os.OpenFile(filename, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	writerCsv := csv.NewWriter(f)
+
+	err = writerCsv.WriteAll(records)
+	if err != nil {
+		return err
+	}
+	writerCsv.Flush()
+
+	return nil
+}
+
+func (fc *File) MustAppendFile(filename string, text string) {
+	err := fc.AppendFile(filename, text)
 	if err != nil {
 		panic(err)
 	}
 }
 
 // AppendFile 附加内容到文件(不存在就创建)
-func (fc *FileClass) AppendFile(filename string, text string) {
+func (fc *File) AppendFile(filename string, text string) error {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
-		panic(err)
+		return err
 	}
 	defer f.Close()
 	if _, err = f.WriteString(text); err != nil {
-		panic(err)
+		return err
 	}
+	return nil
 }
 
-func (fc *FileClass) Exists(fileOrPath string) bool {
+func (fc *File) Exists(fileOrPath string) bool {
 	_, err := os.Stat(fileOrPath)
 	if err != nil {
 		if os.IsExist(err) {
@@ -47,7 +89,7 @@ func (fc *FileClass) Exists(fileOrPath string) bool {
 	return true
 }
 
-func (fc *FileClass) IsDir(path string) bool {
+func (fc *File) IsDir(path string) bool {
 	s, err := os.Stat(path)
 	if err != nil {
 		return false
@@ -55,45 +97,64 @@ func (fc *FileClass) IsDir(path string) bool {
 	return s.IsDir()
 }
 
-func (fc *FileClass) IsFile(path string) bool {
+func (fc *File) IsFile(path string) bool {
 	return !fc.IsDir(path)
 }
 
-func (fc *FileClass) MakeDir(dir string) {
-	err := os.Mkdir(dir, os.ModePerm)
+func (fc *File) MustMakeDir(dir string) {
+	err := fc.MakeDir(dir)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (fc *FileClass) MakeFile(filename string) {
+func (fc *File) MakeDir(dir string) error {
+	err := os.Mkdir(dir, os.ModePerm)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (fc *File) MustMakeFile(filename string) {
+	err := fc.MakeFile(filename)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func (fc *File) MakeFile(filename string) error {
 	f, err := os.Create(filename)
 	defer f.Close()
 	if err != nil {
-		panic(err)
-	} else {
-		_, err = f.Write([]byte(``))
-		if err != nil {
-			panic(err)
-		}
+		return err
 	}
-}
-
-func (fc *FileClass) AssertPathExist(path string) {
-	if !fc.Exists(path) {
-		fc.MakeDir(path)
-	}
-}
-
-func (fc *FileClass) ReadFile(filename string) []byte {
-	bytes, err := os.ReadFile(filename)
+	_, err = f.Write([]byte(``))
 	if err != nil {
-		panic(err)
+		return err
 	}
-	return bytes
+	return nil
 }
 
-func (fc *FileClass) ReadLine(filename string, callback func(text string, shouldProcess bool) error) error {
+func (fc *File) AssertPathExist(path string) error {
+	if fc.Exists(path) {
+		return nil
+	}
+	return fc.MakeDir(path)
+}
+
+func (fc *File) ReadFile(filename string) ([]byte, error) {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
+}
+
+func (fc *File) ReadLine(
+	filename string,
+	callback func(text string, shouldProcess bool) error,
+) error {
 	f, err := os.Open(filename)
 	if err != nil {
 		return err
@@ -114,7 +175,7 @@ func (fc *FileClass) ReadLine(filename string, callback func(text string, should
 	return nil
 }
 
-func (fc *FileClass) WriteLines(filename string, lines []string) error {
+func (fc *File) WriteLines(filename string, lines []string) error {
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -128,12 +189,12 @@ func (fc *FileClass) WriteLines(filename string, lines []string) error {
 	return w.Flush()
 }
 
-func (fc *FileClass) GetExt(filename string) string {
+func (fc *File) GetExt(filename string) string {
 	arr := strings.Split(filename, `.`)
 	return arr[len(arr)-1]
 }
 
-func (fc *FileClass) ReadFileWithErr(filename string) ([]byte, error) {
+func (fc *File) ReadFileWithErr(filename string) ([]byte, error) {
 	bytes, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -141,7 +202,7 @@ func (fc *FileClass) ReadFileWithErr(filename string) ([]byte, error) {
 	return bytes, nil
 }
 
-func (fc *FileClass) MultipartFileToBytes(file multipart.File) []byte {
+func (fc *File) MultipartFileToBytes(file multipart.File) []byte {
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
 		go_error.ThrowInternal(fmt.Errorf(`MultipartFileToBytes error`))
@@ -149,10 +210,10 @@ func (fc *FileClass) MultipartFileToBytes(file multipart.File) []byte {
 	return buf.Bytes()
 }
 
-func (fc *FileClass) GetExePath() string {
+func (fc *File) GetExePath() (string, error) {
 	filePath, err := os.Executable()
 	if err != nil {
-		panic(err)
+		return "", err
 	}
-	return filepath.Dir(filePath)
+	return filepath.Dir(filePath), nil
 }
