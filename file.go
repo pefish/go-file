@@ -143,6 +143,14 @@ func (fc *File) AssertPathExist(path string) error {
 	return fc.MakeDir(path)
 }
 
+func (fc *File) MustReadFile(filename string) []byte {
+	b, err := fc.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	return b
+}
+
 func (fc *File) ReadFile(filename string) ([]byte, error) {
 	b, err := os.ReadFile(filename)
 	if err != nil {
@@ -192,14 +200,6 @@ func (fc *File) WriteLines(filename string, lines []string) error {
 func (fc *File) GetExt(filename string) string {
 	arr := strings.Split(filename, `.`)
 	return arr[len(arr)-1]
-}
-
-func (fc *File) ReadFileWithErr(filename string) ([]byte, error) {
-	bytes, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, err
-	}
-	return bytes, nil
 }
 
 func (fc *File) MultipartFileToBytes(file multipart.File) []byte {
