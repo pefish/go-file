@@ -2,12 +2,8 @@ package go_file
 
 import (
 	"bufio"
-	"bytes"
 	"encoding/csv"
 	"fmt"
-	"github.com/pefish/go-error"
-	"io"
-	"mime/multipart"
 	"os"
 	"path/filepath"
 	"strings"
@@ -200,14 +196,6 @@ func (fc *File) WriteLines(filename string, lines []string) error {
 func (fc *File) GetExt(filename string) string {
 	arr := strings.Split(filename, `.`)
 	return arr[len(arr)-1]
-}
-
-func (fc *File) MultipartFileToBytes(file multipart.File) []byte {
-	buf := bytes.NewBuffer(nil)
-	if _, err := io.Copy(buf, file); err != nil {
-		go_error.ThrowInternal(fmt.Errorf(`MultipartFileToBytes error`))
-	}
-	return buf.Bytes()
 }
 
 func (fc *File) GetExePath() (string, error) {
