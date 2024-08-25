@@ -14,26 +14,12 @@ type File struct {
 
 var FileInstance = File{}
 
-func (fc *File) MustWriteFile(filename string, datas []byte) {
-	err := fc.WriteFile(filename, datas)
-	if err != nil {
-		panic(err)
-	}
-}
-
 func (fc *File) WriteFile(filename string, datas []byte) error {
 	err := os.WriteFile(filename, datas, 0777)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func (fc *File) MustAppendCsvFile(filename string, records [][]string) {
-	err := fc.AppendCsvFile(filename, records)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (fc *File) AppendCsvFile(filename string, records [][]string) error {
@@ -54,13 +40,6 @@ func (fc *File) AppendCsvFile(filename string, records [][]string) error {
 	return nil
 }
 
-func (fc *File) MustAppendFile(filename string, text string) {
-	err := fc.AppendFile(filename, text)
-	if err != nil {
-		panic(err)
-	}
-}
-
 // AppendFile 附加内容到文件(不存在就创建)
 func (fc *File) AppendFile(filename string, text string) error {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
@@ -74,15 +53,15 @@ func (fc *File) AppendFile(filename string, text string) error {
 	return nil
 }
 
-func (fc *File) Exists(fileOrPath string) bool {
+func (fc *File) Exists(fileOrPath string) (bool, error) {
 	_, err := os.Stat(fileOrPath)
-	if err != nil {
-		if os.IsExist(err) {
-			return true
-		}
-		return false
+	if err == nil {
+		return true, nil
 	}
-	return true
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
 func (fc *File) IsDir(path string) bool {
@@ -97,26 +76,13 @@ func (fc *File) IsFile(path string) bool {
 	return !fc.IsDir(path)
 }
 
-func (fc *File) MustMakeDir(dir string) {
-	err := fc.MakeDir(dir)
-	if err != nil {
-		panic(err)
-	}
-}
-
+// 如果文件夹已经存在，则返回 nil
 func (fc *File) MakeDir(dir string) error {
-	err := os.Mkdir(dir, os.ModePerm)
+	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		return err
 	}
 	return nil
-}
-
-func (fc *File) MustMakeFile(filename string) {
-	err := fc.MakeFile(filename)
-	if err != nil {
-		panic(err)
-	}
 }
 
 func (fc *File) MakeFile(filename string) error {
@@ -133,9 +99,6 @@ func (fc *File) MakeFile(filename string) error {
 }
 
 func (fc *File) AssertPathExist(path string) error {
-	if fc.Exists(path) {
-		return nil
-	}
 	return fc.MakeDir(path)
 }
 
