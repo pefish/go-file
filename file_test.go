@@ -5,12 +5,12 @@ import (
 )
 
 func TestFileClass_AppendFile(t *testing.T) {
-	//FileInstance.AppendFile(`1.txt`, "haha\n")
+	//AppendFile(`1.txt`, "haha\n")
 }
 
 func TestFile_MustWriteCsvFile(t *testing.T) {
-	FileInstance.AppendCsvFile("1.csv", [][]string{
-		[]string{
+	AppendCsvFile("1.csv", [][]string{
+		{
 			"123",
 			"gsfdga",
 			"gsdfgw",

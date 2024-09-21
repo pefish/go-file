@@ -3,18 +3,14 @@ package go_file
 import (
 	"bufio"
 	"encoding/csv"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 )
 
-type File struct {
-}
-
-var FileInstance = File{}
-
-func (fc *File) WriteFile(filename string, datas []byte) error {
+func WriteFile(filename string, datas []byte) error {
 	err := os.WriteFile(filename, datas, 0777)
 	if err != nil {
 		return err
@@ -22,7 +18,7 @@ func (fc *File) WriteFile(filename string, datas []byte) error {
 	return nil
 }
 
-func (fc *File) AppendCsvFile(filename string, records [][]string) error {
+func AppendCsvFile(filename string, records [][]string) error {
 	f, err := os.OpenFile(filename, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
 		return err
@@ -41,7 +37,7 @@ func (fc *File) AppendCsvFile(filename string, records [][]string) error {
 }
 
 // AppendFile 附加内容到文件(不存在就创建)
-func (fc *File) AppendFile(filename string, text string) error {
+func AppendFile(filename string, text string) error {
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return err
@@ -53,7 +49,7 @@ func (fc *File) AppendFile(filename string, text string) error {
 	return nil
 }
 
-func (fc *File) Exists(fileOrPath string) (bool, error) {
+func Exists(fileOrPath string) (bool, error) {
 	_, err := os.Stat(fileOrPath)
 	if err == nil {
 		return true, nil
@@ -64,7 +60,7 @@ func (fc *File) Exists(fileOrPath string) (bool, error) {
 	return false, err
 }
 
-func (fc *File) IsDir(path string) bool {
+func IsDir(path string) bool {
 	s, err := os.Stat(path)
 	if err != nil {
 		return false
@@ -72,12 +68,12 @@ func (fc *File) IsDir(path string) bool {
 	return s.IsDir()
 }
 
-func (fc *File) IsFile(path string) bool {
-	return !fc.IsDir(path)
+func IsFile(path string) bool {
+	return !IsDir(path)
 }
 
 // 如果文件夹已经存在，则返回 nil
-func (fc *File) MakeDir(dir string) error {
+func MakeDir(dir string) error {
 	err := os.MkdirAll(dir, os.ModePerm)
 	if err != nil {
 		return err
@@ -85,7 +81,7 @@ func (fc *File) MakeDir(dir string) error {
 	return nil
 }
 
-func (fc *File) MakeFile(filename string) error {
+func MakeFile(filename string) error {
 	f, err := os.Create(filename)
 	defer f.Close()
 	if err != nil {
@@ -98,19 +94,19 @@ func (fc *File) MakeFile(filename string) error {
 	return nil
 }
 
-func (fc *File) AssertPathExist(path string) error {
-	return fc.MakeDir(path)
+func AssertPathExist(path string) error {
+	return MakeDir(path)
 }
 
-func (fc *File) MustReadFile(filename string) []byte {
-	b, err := fc.ReadFile(filename)
+func MustReadFile(filename string) []byte {
+	b, err := ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 	return b
 }
 
-func (fc *File) ReadFile(filename string) ([]byte, error) {
+func ReadFile(filename string) ([]byte, error) {
 	b, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -118,7 +114,19 @@ func (fc *File) ReadFile(filename string) ([]byte, error) {
 	return b, nil
 }
 
-func (fc *File) ReadLine(
+func ReadJsonFile(v any, filename string) error {
+	b, err := os.ReadFile(filename)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(b, v)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ReadLine(
 	filename string,
 	callback func(text string, shouldProcess bool) error,
 ) error {
@@ -142,7 +150,7 @@ func (fc *File) ReadLine(
 	return nil
 }
 
-func (fc *File) WriteLines(filename string, lines []string) error {
+func WriteLines(filename string, lines []string) error {
 	f, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -156,12 +164,12 @@ func (fc *File) WriteLines(filename string, lines []string) error {
 	return w.Flush()
 }
 
-func (fc *File) GetExt(filename string) string {
+func GetExt(filename string) string {
 	arr := strings.Split(filename, `.`)
 	return arr[len(arr)-1]
 }
 
-func (fc *File) GetExePath() (string, error) {
+func GetExePath() (string, error) {
 	filePath, err := os.Executable()
 	if err != nil {
 		return "", err
