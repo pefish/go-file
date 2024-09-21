@@ -18,6 +18,18 @@ func WriteFile(filename string, datas []byte) error {
 	return nil
 }
 
+func WriteJsonFile(filename string, data any) error {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	err = os.WriteFile(filename, b, 0777)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func AppendCsvFile(filename string, records [][]string) error {
 	f, err := os.OpenFile(filename, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0666)
 	if err != nil {
