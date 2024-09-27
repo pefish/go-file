@@ -6,9 +6,21 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/google/uuid"
 )
+
+func WriteTempFile(datas []byte) (string, error) {
+	filename := path.Join(os.TempDir(), uuid.New().String())
+	err := os.WriteFile(filename, datas, 0777)
+	if err != nil {
+		return "", err
+	}
+	return filename, nil
+}
 
 func WriteFile(filename string, datas []byte) error {
 	err := os.WriteFile(filename, datas, 0777)
