@@ -4,13 +4,16 @@ import (
 	"bufio"
 	"encoding/csv"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
 
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 func WriteTempFile(datas []byte) (string, error) {
@@ -188,15 +191,33 @@ func WriteLines(filename string, lines []string) error {
 	return w.Flush()
 }
 
-func GetExt(filename string) string {
+func Ext(filename string) string {
 	arr := strings.Split(filename, `.`)
 	return arr[len(arr)-1]
 }
 
-func GetExePath() (string, error) {
+func ExecPath() (string, error) {
 	filePath, err := os.Executable()
 	if err != nil {
 		return "", err
 	}
 	return filepath.Dir(filePath), nil
+}
+
+func SourceFileDir() (string, error) {
+	_, filename, _, ok := runtime.Caller(1)
+	if !ok {
+		return "", errors.New("No caller information")
+	}
+
+	// 将文件的路径转换为绝对路径
+	absPath, err := filepath.Abs(filename)
+	if err != nil {
+		return "", err
+	}
+
+	// 获取执行文件所在的目录
+	dir := filepath.Dir(absPath)
+
+	return dir, nil
 }
