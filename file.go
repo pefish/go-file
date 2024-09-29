@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/csv"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 	"path"
